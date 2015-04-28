@@ -60,6 +60,23 @@ class Isla(irc.bot.SingleServerIRCBot):
             print "Notice: Autojoining channel {channel}".format(channel=channel)
             c.join(channel)
 
+    def reload_module(self, module):
+        # First, unbind everything with that name
+        self.unbind_plugin(module)
+        try:
+            reload(self.mods[module])
+        except:
+            print "Exception while reloading {module}".format(module=module)
+            traceback.print_exc(file=sys.stdout)
+
+    def load_module(self, module):
+        if name == "__init__": return
+        try:
+            bot.isla.mods[module] = importlib.import_module("mods.{name}".format(name=module))
+        except:
+            print "Exception while loading {module}".format(module=module)
+            traceback.print_exc(file=sys.stdout)
+
     def check_reload(self):
         results = filter(lambda x: x.endswith('.py'), self.watcher.check())
         if results:
@@ -67,18 +84,21 @@ class Isla(irc.bot.SingleServerIRCBot):
             for r in results:
                 module = r.split("/")[-1].replace(".py","")
                 if module in self.mods:
-                    # First, unbind everything with that name
-                    self.unbind_plugin(module)
-                    reload(self.mods[module])
+                    self.reload_module(module)
+                else:
+                    self.load_module(module)
 
     def unbind_plugin(self, plugin):
         for bind in self.binds:
+            print "Unbinding {bind}".format(bind=bind)
             to_del = []
             for thing in self.binds[bind]:
                 p, _ = thing
-                if p == plugin:
+                print "Checking {thing}".format(thing=p)
+                if p == "mods." + plugin:
                     to_del.append(thing)
             for t in to_del:
+                print "Unbinding {bind}.{thing}".format(bind=bind,thing=t)
                 del self.binds[bind][t]
 
     def on_pubmsg(self, c, e):
@@ -136,9 +156,7 @@ if __name__ == "__main__":
     r = re.compile("^mods\/(.*)\.py$")
     for mod in glob.glob("mods/*.py"):
         name = r.match(mod).group(1)
-        if name == "__init__": continue
-        print "Loading module {mod}...".format(mod=name)
-        bot.isla.mods[name] = importlib.import_module("mods.{name}".format(name=name))
+        bot.isla.load_module(name)
     bot.isla.start()
 
 def bind(bind_type, match, i=False):
