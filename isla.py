@@ -1,17 +1,39 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import irc.bot
+import glob
 import importlib
 import inspect
-import glob
 import re
 import sys
 import traceback
+
+import irc.bot
+import pyinotify
 
 import bot
 import config
 
 __version__ = '0.0.2'
+
+class SynchronousWatcher(pyinotify.ProcessEvent):
+    def my_init(self, path):
+        self.path = path
+        self.watch = pyinotify.WatchManager()
+        self.notifier = pyinotify.Notifier(self.watch, default_proc_fun=self)
+        self.watch.add_watch(path, pyinotify.ALL_EVENTS, rec=True, auto_add=True)
+
+    def check(self):
+        self.results = set()
+        if self.notifier.check_events(timeout=0):
+            self.notifier.read_events()
+        self.notifier.process_events()
+        return self.results
+
+    def process_IN_MODIFY(self, event):
+        self.results.add(event.pathname)
+
+    def process_IN_CLOSE_WRITE(self, event):
+        self.results.add(event.pathname)
 
 class Isla(irc.bot.SingleServerIRCBot):
     def __init__(self, *args, **kwargs):
@@ -20,6 +42,8 @@ class Isla(irc.bot.SingleServerIRCBot):
         self.binds = {}
         self.binds["reply"] = {}
         self.binds["hear"] = {}
+
+        self.watcher = SynchronousWatcher(path="mods")
 
     def on_nicknameinuse(self, c, e):
         old = c.get_nickname()
@@ -36,7 +60,30 @@ class Isla(irc.bot.SingleServerIRCBot):
             print "Notice: Autojoining channel {channel}".format(channel=channel)
             c.join(channel)
 
+    def check_reload(self):
+        results = filter(lambda x: x.endswith('.py'), self.watcher.check())
+        if results:
+            print "Reloading modules..."
+            for r in results:
+                module = r.split("/")[-1].replace(".py","")
+                if module in self.mods:
+                    # First, unbind everything with that name
+                    self.unbind_plugin(module)
+                    reload(self.mods[module])
+
+    def unbind_plugin(self, plugin):
+        for bind in self.binds:
+            to_del = []
+            for thing in self.binds[bind]:
+                p, _ = thing
+                if p == plugin:
+                    to_del.append(thing)
+            for t in to_del:
+                del self.binds[bind][t]
+
     def on_pubmsg(self, c, e):
+        self.check_reload()
+
         at_me = False
         msg = e.arguments[0].strip()
 
@@ -71,6 +118,7 @@ class Isla(irc.bot.SingleServerIRCBot):
         c.privmsg(e.target, msg)
 
     def bind(self, bind_type, plugin, match, func, i=False):
+        print "Binding module {module} function {func}".format(module=plugin, func=func.__name__)
         if not bind_type in self.binds:
             raise ValueError("Invalid bind type: {type}".format(bind_type))
         flags = re.U | (re.I if i else 0)
