@@ -11,8 +11,8 @@ This isn't a proper Python package yet, so you'll need to do some manual gruntwo
 * Set up a virtualenv and `pip install irc`.
 * Write a `config.py` in the root:
 
-    nickserver_password = 'hunter2'
-    autojoin = ['#some-channel']
-    server = ('irc.freenode.net', 6667)
+        nickserver_password = 'hunter2'
+        autojoin = ['#some-channel']
+        server = ('irc.freenode.net', 6667)
 
 * Start Isla: `python isla.py`
