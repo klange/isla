@@ -12,7 +12,7 @@ def google_search(self, c, e, msg, match):
     values = {
             'v': '1.0',
             'rsz': '8',
-            'q': match.group(2),
+            'q': match.group(2).encode('utf-8'),
             'safe': 'active',
     }
 
