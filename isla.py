@@ -13,7 +13,7 @@ import pyinotify
 import bot
 import config
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 class SynchronousWatcher(pyinotify.ProcessEvent):
     def my_init(self, path):
@@ -136,6 +136,9 @@ class Isla(irc.bot.SingleServerIRCBot):
 
     def send(self, c, e, msg):
         c.privmsg(e.target, msg)
+
+    def action(self, c, e, msg):
+        self.send(c, e, "\001ACTION {message}\001".format(message=msg))
 
     def bind(self, bind_type, plugin, match, func, i=False):
         print "Binding module {module} function {func}".format(module=plugin, func=func.__name__)

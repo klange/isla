@@ -7,6 +7,15 @@ import isla
 def reply_hello(self, c, e, msg, match):
     self.reply(c,e,"Hello!")
 
+@isla.bind("reply", "^good girl\.?$", i=True)
+def good_girl(self, c, e, msg, match):
+    self.reply(c,e,"Oi...")
+
+@isla.bind("reply", "stab (.*)$", i=True)
+def good_girl(self, c, e, msg, match):
+    if len(match.group(1)):
+        self.action(c,e,"stabs {person}".format(person=match.group(1)))
+
 @isla.bind("reply", "^(good )?morning[.!]?$", i=True)
 def good_morning(self, c, e, msg, match):
     h = datetime.datetime.now().hour

@@ -16,6 +16,9 @@ def monitor_channel(self, c, e, msg, match):
 @isla.bind("reply", "^tell +([-a-zA-Z0-9]*):? +(.*)$", i=True)
 def receive_tell(self, c, e, msg, match):
     target = match.group(1).lower()
+    if target == c.get_nickname():
+        self.reply(c,e,"Okay? Thanks for letting me know.")
+        return
     message = match.group(2)
     if not target in self.tells:
         self.tells[target] = {}
