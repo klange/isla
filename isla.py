@@ -13,7 +13,7 @@ import pyinotify
 import bot
 import config
 
-__version__ = '0.0.2'
+__version__ = '0.1.0'
 
 class SynchronousWatcher(pyinotify.ProcessEvent):
     def my_init(self, path):
@@ -149,7 +149,7 @@ class Isla(irc.bot.SingleServerIRCBot):
             raise ValueError("Bad regex: {match}".format(match))
 
 if __name__ == "__main__":
-    bot.isla = Isla([config.server], "isla", "isla")
+    bot.isla = Isla([config.server], config.nick, config.realname)
     bot.isla.autojoin = config.autojoin
     bot.isla.mods = {}
     # Bind plugins

@@ -15,6 +15,8 @@ This isn't a proper Python package yet, so you'll need to do some manual gruntwo
     nickserver_password = 'hunter2'
     autojoin = ['#some-channel']
     server = ('irc.freenode.net', 6667)
+    nick = "isla"
+    realname = "isla"
     ```
 
 * Start Isla: `python isla.py`
