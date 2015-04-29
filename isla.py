@@ -152,6 +152,9 @@ class Isla(irc.bot.SingleServerIRCBot):
             raise ValueError("Bad regex: {match}".format(match))
 
 if __name__ == "__main__":
+    reload(sys)
+    sys.setdefaultencoding('UTF8')
+
     bot.isla = Isla([config.server], config.nick, config.realname)
     bot.isla.autojoin = config.autojoin
     bot.isla.mods = {}
