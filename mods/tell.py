@@ -13,7 +13,7 @@ def monitor_channel(self, c, e, msg, match):
         del self.tells[nick]
     self.lastsaw[nick] = datetime.datetime.now()
 
-@isla.bind("reply", "^tell +([-a-zA-Z0-9]*):? +(.*)$", i=True)
+@isla.bind("reply", "^tell +([-_a-zA-Z0-9]*):? +(.*)$", i=True)
 def receive_tell(self, c, e, msg, match):
     target = match.group(1).lower()
     if target == c.get_nickname():
@@ -25,7 +25,7 @@ def receive_tell(self, c, e, msg, match):
     self.tells[target][e.source.nick] = message
     self.reply(c,e,"I'll let them know when they next speak up.")
 
-@isla.bind("reply", "^when did you last see ([-a-zA-Z0-9]*)\??$", i=True)
+@isla.bind("reply", "^when did you last see ([-_a-zA-Z0-9]*)\??$", i=True)
 def last_saw(self, c, e, msg, match):
     target = match.group(1)
     if not target.lower() in self.lastsaw:
