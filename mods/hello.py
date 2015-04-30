@@ -29,10 +29,18 @@ stabbing_replies = [
     "slits {person}'s throat",
 ]
 
-@isla.bind("reply", "stab (.*)$", i=True)
-def good_girl(self, c, e, msg, match):
+friend_replies = [
+    "Eh, why would I stab {person}, they are my friend!",
+    "I don't want to stab {person}!",
+]
+
+@isla.bind("reply", "^stab (.*)$", i=True)
+def stabby_stabby(self, c, e, msg, match):
     if len(match.group(1)):
-        self.action(c,e,random.choice(stabbing_replies).format(person=match.group(1)))
+        if "friends" in dir(isla.config) and match.group(1).lower() in isla.config.friends:
+            self.reply(c,e,random.choice(friend_replies).format(person=match.group(1)))
+        else:
+            self.action(c,e,random.choice(stabbing_replies).format(person=match.group(1)))
 
 night_replies = [
     "It's too early...",
@@ -61,4 +69,12 @@ def good_morning(self, c, e, msg, match):
         self.reply(c,e,random.choice(evening_replies))
     else:
         self.reply(c,e,random.choice(morning_replies))
+
+@isla.bind("reply", "^jump[.!]?$", i=True)
+def jump_webm(self, c, e, msg, match):
+    self.reply(c,e,"http://a.pomf.se/lepwja.webm")
+
+@isla.bind("reply", "^smile[.!]?$", i=True)
+def smile(self, c, e, msg, match):
+    self.reply(c,e,"http://i.imgur.com/TefCf8e.png")
 
