@@ -154,6 +154,7 @@ class Isla(irc.bot.SingleServerIRCBot):
 if __name__ == "__main__":
     reload(sys)
     sys.setdefaultencoding('UTF8')
+    irc.buffer.DecodingLineBuffer.errors = 'replace'
 
     bot.isla = Isla([config.server], config.nick, config.realname)
     bot.isla.autojoin = config.autojoin
