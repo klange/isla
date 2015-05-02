@@ -7,6 +7,7 @@ stabbing_replies = [
     "stabs {person}",
     "shanks {person}",
     "slits {person}'s throat",
+    "recites the first law: 'A robot may not injure a human being, or through inaction, allow a human being to come to harm.'",
 ]
 
 friend_replies = [
@@ -21,6 +22,12 @@ unknown_replies = [
     "Error. I didn't quite catch that.",
 ]
 
+no_self_harm = [
+    "won't hurt herself.",
+    "doesn't want to stab herself.",
+    "ignores {person}."
+]
+
 def in_channel(user, users):
     return user.lower() in [x.lower() for x in users]
 
@@ -33,6 +40,8 @@ def stabby_stabby(self, c, e, msg, match):
                 return
         if "friends" in dir(isla.config) and match.group(1).lower() in isla.config.friends:
             self.reply(c,e,random.choice(friend_replies).format(person=match.group(1)))
+        elif match.group(1).lower() == c.get_nickname().lower():
+            self.action(c,e,random.choice(no_self_harm).format(person=e.source.nick))
         else:
             self.action(c,e,random.choice(stabbing_replies).format(person=match.group(1)))
 
