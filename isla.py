@@ -54,7 +54,8 @@ class Isla(irc.bot.SingleServerIRCBot):
     def on_welcome(self, c, e):
         # Identify
         print "Notice: Hello world! Connected and identifying."
-        c.privmsg('NickServ', 'IDENTIFY {password}'.format(password=config.nickserver_password))
+        if config.nickserver_password:
+            c.privmsg('NickServ', 'IDENTIFY {password}'.format(password=config.nickserver_password))
         # Join autojoin channels
         for channel in self.autojoin:
             print "Notice: Autojoining channel {channel}".format(channel=channel)
