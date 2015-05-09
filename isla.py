@@ -11,7 +11,6 @@ import irc.bot
 import pyinotify
 
 import bot
-import config
 
 __version__ = '0.1.1'
 
@@ -54,10 +53,10 @@ class Isla(irc.bot.SingleServerIRCBot):
     def on_welcome(self, c, e):
         # Identify
         print "Notice: Hello world! Connected and identifying."
-        if config.nickserver_password:
-            c.privmsg('NickServ', 'IDENTIFY {password}'.format(password=config.nickserver_password))
+        if bot.config.nickserver_password:
+            c.privmsg('NickServ', 'IDENTIFY {password}'.format(password=bot.config.nickserver_password))
         # Join autojoin channels
-        for channel in self.autojoin:
+        for channel in bot.config.autojoin:
             print "Notice: Autojoining channel {channel}".format(channel=channel)
             c.join(channel)
 
@@ -108,7 +107,7 @@ class Isla(irc.bot.SingleServerIRCBot):
         at_me = False
         msg = e.arguments[0].strip()
 
-        if msg.startswith(c.get_nickname() + ":") or msg.startswith(c.get_nickname() + ","):
+        if msg.lower().startswith(c.get_nickname() + ":") or msg.lower().startswith(c.get_nickname() + ","):
             at_me = True
             msg = msg[len(c.get_nickname()) + 1:].strip()
 
@@ -157,8 +156,12 @@ if __name__ == "__main__":
     sys.setdefaultencoding('UTF8')
     irc.buffer.DecodingLineBuffer.errors = 'replace'
 
-    bot.isla = Isla([config.server], config.nick, config.realname)
-    bot.isla.autojoin = config.autojoin
+    config = "config"
+    if '--config' in sys.argv:
+        config = sys.argv[sys.argv.index('--config')+1]
+    _config = importlib.import_module(config)
+    bot.isla = Isla([_config.server], _config.nick, _config.realname)
+    bot.config = _config
     bot.isla.mods = {}
     # Bind plugins
     r = re.compile("^mods\/(.*)\.py$")

@@ -38,7 +38,7 @@ def stabby_stabby(self, c, e, msg, match):
             if not in_channel(match.group(1), self.channels[e.target].users()):
                 self.reply(c,e,random.choice(unknown_replies).format(person=match.group(1)))
                 return
-        if "friends" in dir(isla.config) and match.group(1).lower() in isla.config.friends:
+        if "friends" in dir(isla.bot.config) and match.group(1).lower() in isla.bot.config.friends:
             self.reply(c,e,random.choice(friend_replies).format(person=match.group(1)))
         elif match.group(1).lower() == c.get_nickname().lower():
             self.action(c,e,random.choice(no_self_harm).format(person=e.source.nick))
