@@ -5,27 +5,26 @@ import urllib2
 import json
 import random
 
+from bs4 import BeautifulSoup
+
 @isla.bind("reply", "^youtube( me)? (.*)", i=True)
 def youtube_search(self, c, e, msg, match):
-    images = 'http://gdata.youtube.com/feeds/api/videos'
+    images = 'https://www.youtube.com/results'
 
     values = {
-            'orderBy': 'relevance',
-            'max-results': 15,
-            'alt': 'json',
-            'q': match.group(2).encode('utf-8'),
+            'search_query': match.group(2).encode('utf-8'),
     }
 
     data = urllib.urlencode(values)
     req = images + '?' + data
     response = urllib2.urlopen(req)
 
-    j = json.loads(response.read())
-    videos = j['feed']['entry']
+    b = BeautifulSoup(response.read())
 
-    video = random.choice(videos)
+    results = [x.get('href') for x in b.find_all("a", attrs={"aria-hidden":"true"}) if u'watch' in x.get('href')][:15]
 
-    for l in video['link']:
-        if l['rel'] == 'alternate' and l['type'] == 'text/html':
-            self.send(c,e,l['href'])
+    link = random.choice(results)
+
+    self.send(c,e,"https://youtube.com" + link)
+
 
