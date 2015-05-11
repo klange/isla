@@ -8,7 +8,7 @@
 
 This isn't a proper Python package yet, so you'll need to do some manual gruntwork:
 
-* Set up a virtualenv and `pip install irc`.
+* Set up a virtualenv and `pip install irc beautifulsoup4`.
 * Write a `config.py` in the root:
 
     ```python
