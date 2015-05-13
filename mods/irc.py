@@ -18,3 +18,7 @@ help_replies = [
 @isla.bind("reply", "^help[.?!]?$", i=True)
 def help(self, c, e, msg, match):
     self.reply(c,e,random.choice(help_replies))
+
+@isla.bind("reply", "^beself[.!]?$", i=True)
+def beself(self, c, e, msg, match):
+    c.nick(isla.bot.config.nick)
