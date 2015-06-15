@@ -9,7 +9,7 @@ rolled_nothing = [
 ]
 
 no_sided = [
-    "How does on roll a no-sided die?",
+    "How does one roll a no-sided die?",
     "Zero.",
     "Error. I didn't quite catch that.",
 ]
