@@ -6,13 +6,15 @@ import inspect
 import re
 import sys
 import traceback
+import ssl
 
 import irc.bot
+import irc.connection
 import pyinotify
 
 import bot
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 class SynchronousWatcher(pyinotify.ProcessEvent):
     def my_init(self, path):
@@ -160,7 +162,10 @@ if __name__ == "__main__":
     if '--config' in sys.argv:
         config = sys.argv[sys.argv.index('--config')+1]
     _config = importlib.import_module(config)
-    bot.isla = Isla([_config.server], _config.nick, _config.realname)
+    if 'ssl' in dir(_config) and _config.ssl:
+        bot.isla = Isla([_config.server], _config.nick, _config.realname, connect_factory=irc.connection.Factory(wrapper=ssl.wrap_socket))
+    else:
+        bot.isla = Isla([_config.server], _config.nick, _config.realname)
     bot.config = _config
     bot.isla.mods = {}
     # Bind plugins
