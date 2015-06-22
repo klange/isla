@@ -103,6 +103,11 @@ class Isla(irc.bot.SingleServerIRCBot):
                 print "Unbinding {bind}.{thing}".format(bind=bind,thing=t)
                 del self.binds[bind][t]
 
+    def on_privmsg(self, c, e):
+        msg = e.arguments[0].strip()
+        self.match_bind('reply', c, e, msg)
+        self.match_bind('hear', c, e, msg)
+
     def on_pubmsg(self, c, e):
         self.check_reload()
 
@@ -115,8 +120,7 @@ class Isla(irc.bot.SingleServerIRCBot):
 
         if at_me:
             self.match_bind('reply', c, e, msg)
-        else:
-            self.match_bind('hear', c, e, msg)
+        self.match_bind('hear', c, e, msg)
 
     def match_bind(self, bind_type, c, e, msg):
         for k, v in self.binds[bind_type].iteritems():
@@ -134,9 +138,13 @@ class Isla(irc.bot.SingleServerIRCBot):
         return "isla [bot] {version}".format(version=__version__)
 
     def reply(self, c, e, msg):
+        if e.target == c.get_nickname():
+            e.target = e.source.nick
         c.privmsg(e.target, "{nick}: {msg}".format(nick=e.source.nick,msg=msg))
 
     def send(self, c, e, msg):
+        if e.target == c.get_nickname():
+            e.target = e.source.nick
         c.privmsg(e.target, msg)
 
     def action(self, c, e, msg):
@@ -152,6 +160,7 @@ class Isla(irc.bot.SingleServerIRCBot):
             self.binds[bind_type][(plugin,match)] = (x, func)
         else:
             raise ValueError("Bad regex: {match}".format(match))
+
 
 if __name__ == "__main__":
     reload(sys)
@@ -174,6 +183,7 @@ if __name__ == "__main__":
         name = r.match(mod).group(1)
         bot.isla.load_module(name)
     bot.isla.start()
+
 
 def bind(bind_type, match, i=False):
     def real_bind(func):
