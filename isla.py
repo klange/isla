@@ -3,10 +3,12 @@
 import glob
 import importlib
 import inspect
+import json
 import re
 import sys
 import traceback
 import ssl
+import sqlite3
 
 import irc.bot
 import irc.connection
@@ -35,6 +37,116 @@ class SynchronousWatcher(pyinotify.ProcessEvent):
 
     def process_IN_CLOSE_WRITE(self, event):
         self.results.add(event.pathname)
+
+
+class Brain(object):
+    """
+        The brain manages data in and out of a backing store.
+        Brain storage should be used for any dynamic information that:
+            1) Should be accessible across multiple instances.
+            2) Must survive restarts.
+            3) May be added or changed during runtime.
+
+        TODO: support deleting
+        (if you have data you add/remove from a lot, consider using a list, as
+        values in a list are stored directly rather than being accessible through
+        the key system; dictionaries that are updated will not have old keys
+        removed at the moment)
+    """
+
+    schema = "CREATE TABLE IF NOT EXISTS brain (key text PRIMARY KEY, data blob)"
+    read_query = "SELECT * FROM brain WHERE key=?"
+    like_query = "SELECT * FROM brain WHERE key LIKE ?"
+    write_query = "INSERT OR REPLACE INTO brain (key, data) VALUES (?,?)"
+    keys_query = "SELECT key FROM brain"
+    keys2_query = "SELECT key FROM brain WHERE key LIKE ?"
+
+    def __init__(self, config_path):
+        self.conn = sqlite3.connect(config_path)
+        self.conn.isolation_level = None
+        self.query(self.schema)
+
+    def query(self, query, args=None):
+        c = self.conn.cursor()
+        if isinstance(args, list):
+            return c.executemany(query, args)
+        if args:
+            return c.execute(query, args)
+        else:
+            return c.execute(query)
+
+    def keys(self, matching=None):
+        if matching:
+            return [x[0] for x in self.query(self.keys2_query, (matching + '%',))]
+        else:
+            return [x[0] for x in self.query(self.keys_query)]
+
+    def getdict(self, path):
+        """
+        Dictionary elements need to be recursively retrieved. If you know a value is set
+        and is a dictionary, you can call this directly, but the safer thing to do
+        would be to call get() which will handle alternative values. If an element does
+        exist, getdict will return an empty dictionary, so it may be what you want in
+        some instances.
+        """
+        results = [x for x in self.query(self.like_query, (path + ".%",))]
+        if not results:
+            return {}
+        else:
+            out = {}
+            for k, v in results:
+                _k = k.replace(path + '.', '', 1)
+                if '.' in _k:
+                    continue
+                _v = json.loads(v)
+                if isinstance(_v, dict):
+                    out[_k] = self.getdict(k)
+                else:
+                    out[_k] = _v
+            return out
+
+    def get(self, path):
+        """
+        Get an individual element's value, from a path. If the element has not been set,
+        a KeyError will be raised. If the element is a dictionary, it will be filled
+        recurisvely.
+        """
+        results = [x for x in self.query(self.read_query, (path,))]
+        if results:
+            value = json.loads(results[0][1])
+            if isinstance(value, dict):
+                return self.getdict(path)
+            else:
+                return value
+        else:
+            value = self.getdict(path)
+            if not value:
+                raise KeyError(path)
+            return value
+
+    def _set(self, path, value):
+        """
+        Write a raw string into the database for a path.
+        """
+        self.query(self.write_query, (path, value))
+
+    def set(self, path, value):
+        """
+        Set a value.
+        Leading entries in path are not currently checked for existence.
+        If value is a dict, each element in it will be (recursively) set.
+        All other values are stored as JSON. If you need to store a dictionary
+        in a way that is *not* accessible from the path hierarchy, consider
+        putting it in a list, as then it won't be recursively stored. That
+        may be useful if you're in-place updating the entire dict several times.
+        """
+        if isinstance(value, dict):
+            self._set(path, "{}")
+            for k, v in value.iteritems():
+                self.set(path + '.' + k, v)
+        else:
+            self._set(path, json.dumps(value))
+
 
 class Isla(irc.bot.SingleServerIRCBot):
     def __init__(self, *args, **kwargs):
@@ -175,6 +287,7 @@ if __name__ == "__main__":
         bot.isla = Isla([_config.server], _config.nick, _config.realname, connect_factory=irc.connection.Factory(wrapper=ssl.wrap_socket))
     else:
         bot.isla = Isla([_config.server], _config.nick, _config.realname)
+    bot.brain = Brain(_config.brain_path if 'brain_path' in dir(_config) and _config.brain_path else 'brain.sqlite')
     bot.config = _config
     bot.isla.mods = {}
     # Bind plugins
