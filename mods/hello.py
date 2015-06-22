@@ -53,7 +53,7 @@ def good_morning(self, c, e, msg, match):
 
 @isla.bind("reply", "^jump[.!]?$", i=True)
 def jump_webm(self, c, e, msg, match):
-    self.reply(c,e,"http://a.pomf.se/lepwja.webm")
+    self.reply(c,e,"https://www.youtube.com/watch?v=Oq4AyJm72Z0")
 
 @isla.bind("reply", "^smile[.!]?$", i=True)
 def smile(self, c, e, msg, match):
