@@ -208,11 +208,9 @@ class Isla(irc.bot.SingleServerIRCBot):
 
     def unbind_plugin(self, plugin):
         for bind in self.binds:
-            print "Unbinding {bind}".format(bind=bind)
             to_del = []
             for thing in self.binds[bind]:
                 p, _ = thing
-                print "Checking {thing}".format(thing=p)
                 if p == "mods." + plugin:
                     to_del.append(thing)
             for t in to_del:
