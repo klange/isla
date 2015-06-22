@@ -147,6 +147,10 @@ class Brain(object):
         else:
             self._set(path, json.dumps(value))
 
+    def __contains__(self, key):
+        results = [x for x in self.query(self.read_query, (key,))]
+        return not not results
+
 
 class Isla(irc.bot.SingleServerIRCBot):
     def __init__(self, *args, **kwargs):

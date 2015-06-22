@@ -6,11 +6,10 @@ def brain_get(self, c, e, msg, match):
     if "friends" not in dir(isla.bot.config) or e.source.nick not in isla.bot.config.friends:
         return
     q = match.group(1)
-    try:
-        value = isla.bot.brain.get(q)
-    except KeyError:
+    if not q in isla.bot.brain:
         self.send(c,e,"{q} is not set.".format(q=q))
         return
+    value = isla.bot.brain.get(q)
     self.send(c,e,"{q} = {v}".format(q=q, v=repr(value)))
 
 @isla.bind("reply", "^brain dump( [a-zA-Z_\-\.]*)?$", i=True)
@@ -19,7 +18,6 @@ def brain_dump(self, c, e, msg, match):
         return
     query = match.group(1).strip() if match.group(1) else None
     self.send(c,e,", ".join(isla.bot.brain.keys(query)))
-
 
 @isla.bind("reply", "^brain test set$")
 def brain_test_set(self, c, e, msg, match):
