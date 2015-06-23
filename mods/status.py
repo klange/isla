@@ -17,3 +17,12 @@ def uptime(self, c, e, msg, match):
 
     self.reply(c,e,"Up {time}".format(time=td_format(delta)))
 
+@isla.bind("reply", "^git sha\??$", i=True)
+def git_sha(self, c, e, msg, match):
+    import subprocess
+    sha = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
+    tag = subprocess.check_output(['git', 'describe', '--tags']).strip()
+    dirty = 1 - subprocess.call("git status -s | grep -q '^.M'", shell=True)
+    self.reply(c,e, "SHA: {sha}{dirty} Tag: {tag}".format(sha=sha,tag=tag,dirty="-dirty" if dirty else ""))
+
+
