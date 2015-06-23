@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+"""Violent action responses."""
 import random
 
 import isla
+
+__version__ = '1.0.0'
 
 stabbing_replies = [
     "stabs {person}",
