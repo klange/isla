@@ -14,7 +14,7 @@ def queue_add(self, c, e, msg, match):
         key = 'queue.{server}.{channel}'.format(server=isla.bot.config.server_shortname, channel=e.target.lower())
         queue = [] if key not in isla.bot.brain else isla.bot.brain.get(key)
         if user in queue:
-            self.reply(c,e,"{person} is already in the queue")
+            self.reply(c,e,"{person} is already in the queue".format(person=user))
             return
         after = queue[-1] if len(queue) else None
         queue.append(user)
