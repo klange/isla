@@ -11,6 +11,7 @@ urls = [
 	"https://www.youtube.com/watch?v=rnS-05XoXs4",
 	"https://www.youtube.com/watch?v=uimCcRx00vw",
 	"https://www.youtube.com/watch?v=eEoMI9BwHp4",
+	"https://www.youtube.com/watch?v=wXzg0D-cKds",
 ]
 
 @isla.bind("reply", "^(snoop anime)|(smoke weed)|(420)$", i=True)
