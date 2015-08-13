@@ -13,6 +13,11 @@ def leave_channel(self, c, e, msg, match):
     if "friends" in dir(isla.bot.config) and e.source.nick in isla.bot.config.friends:
         c.part(e.target)
 
+@isla.bind("reply", "^list channels$", i=True)
+def leave_channel(self, c, e, msg, match):
+    if "friends" in dir(isla.bot.config) and e.source.nick in isla.bot.config.friends:
+        self.reply(c,e,"I am in: {channels}".format(channels=", ".join(self.channels)))
+
 help_replies = [
     "Hm?",
     "What I can do for you?",
