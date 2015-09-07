@@ -59,3 +59,6 @@ def jump_webm(self, c, e, msg, match):
 def smile(self, c, e, msg, match):
     self.reply(c,e,"http://i.imgur.com/TefCf8e.png")
 
+@isla.bind("reply", "^source$", i=True)
+def source(self, c, e, msg, match):
+    self.reply(c,e,"https://github.com/klange/isla")
