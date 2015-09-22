@@ -228,7 +228,7 @@ class Isla(irc.bot.SingleServerIRCBot):
         at_me = False
         msg = e.arguments[0].strip()
 
-        if msg.lower().startswith(c.get_nickname() + ":") or msg.lower().startswith(c.get_nickname() + ","):
+        if msg.lower().startswith(c.get_nickname().lower() + ":") or msg.lower().startswith(c.get_nickname().lower() + ","):
             at_me = True
             msg = msg[len(c.get_nickname()) + 1:].strip()
 
