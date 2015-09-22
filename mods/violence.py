@@ -48,3 +48,8 @@ def stabby_stabby(self, c, e, msg, match):
         else:
             self.action(c,e,random.choice(stabbing_replies).format(person=match.group(1)))
 
+
+@isla.bind("reply","^shoot me$", i=True)
+def shoot_me(self, c, e, msg, match):
+    self.reply(c,e,u"😄🔫")
+
