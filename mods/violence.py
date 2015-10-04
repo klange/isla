@@ -36,6 +36,7 @@ def in_channel(user, users):
 
 @isla.bind("reply", "^stab (.*)$", i=True)
 def stabby_stabby(self, c, e, msg, match):
+    """stab [person]: inflict bodily harm"""
     if len(match.group(1)):
         if e.target in self.channels:
             if not in_channel(match.group(1), self.channels[e.target].users()):
