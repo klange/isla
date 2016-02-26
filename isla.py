@@ -240,7 +240,7 @@ class Isla(irc.bot.SingleServerIRCBot):
         for k, v in self.binds[bind_type].iteritems():
             plugin, source = k
             match, func = v
-            result = match.match(msg)
+            result = match.search(msg)
             if result:
                 try:
                     func(self, c,e,msg,result)
