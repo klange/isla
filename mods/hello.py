@@ -63,6 +63,6 @@ def smile(self, c, e, msg, match):
 def poke(self, c, e, msg, match):
     self.reply(c,e,"http://i.imgur.com/NJzq31H.jpg")
 
-@isla.bind("reply", "^source$", i=True)
+@isla.bind("reply", "^source\??$", i=True)
 def source(self, c, e, msg, match):
     self.reply(c,e,"https://github.com/klange/isla")
