@@ -13,6 +13,8 @@ def google_search(self, c, e, msg, match):
 
     images = re.findall('imgurl=.+?(?=&amp)', response, re.DOTALL)
 
+    images = [x for x in images if not "i.pinimg." in x]
+
     if len(images) > 0:
         choice = random.choice(images)[7:]
         self.send(c,e,urllib.unquote(choice))
