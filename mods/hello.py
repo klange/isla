@@ -66,3 +66,20 @@ def poke(self, c, e, msg, match):
 @isla.bind("reply", "^source\??$", i=True)
 def source(self, c, e, msg, match):
     self.reply(c,e,"https://github.com/klange/isla")
+
+#@isla.bind("hear", "[ *]shr(u+)g[ *]", i=True)
+#def shrug(self, c, e, msg, match):
+#    shrug_size = len(match.group(1))
+#    self.send(c,e,u"¯\\" + "_" * shrug_size + "(ツ)" + "_" * shrug_size + "/¯")
+
+last_slam_jam = 1
+@isla.bind("reply", "^come on and slam$", i=True)
+def slamjam(self, c, e, msg, match):
+    global last_slam_jam
+    if last_slam_jam == 1:
+        last_slam_jam = 0
+        self.send(c,e,"and welcome to the jam")
+    else:
+        last_slam_jam = 1
+        self.send(c,e,"and welcome to japan")
+
