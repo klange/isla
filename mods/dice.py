@@ -40,8 +40,14 @@ def roll_dice(self, c, e, msg, match):
     elif sides > 100000:
         self.reply(c,e,random.choice(big_dice))
     else:
+        results = []
         _sum = 0
         for x in xrange(count):
-            _sum += random.randrange(1,sides+1)
-        self.reply(c,e,"{d}".format(d=_sum))
+            t = random.randrange(1,sides+1)
+            results.append(str(t))
+            _sum += t
+        if count == 1:
+            self.reply(c,e,"{d}".format(d=_sum))
+        else:
+            self.reply(c,e,"{t} = {d}".format(t="+".join(results),d=_sum))
 
