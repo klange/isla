@@ -14,7 +14,7 @@ def leave_channel(self, c, e, msg, match):
         c.part(e.target)
 
 @isla.bind("reply", "^list channels$", i=True)
-def leave_channel(self, c, e, msg, match):
+def list_channel(self, c, e, msg, match):
     if "friends" in dir(isla.bot.config) and e.source.nick in isla.bot.config.friends:
         self.reply(c,e,"I am in: {channels}".format(channels=", ".join(self.channels)))
 
@@ -32,3 +32,30 @@ def help(self, c, e, msg, match):
 @isla.bind("reply", "^beself[.!]?$", i=True)
 def beself(self, c, e, msg, match):
     c.nick(isla.bot.config.nick)
+
+blacklist = [
+    "▄▄▄▄▄",
+    "SUPERNETS",
+    "supernets",
+    "HAPPY APRIL FLOODS DAY",
+    "nigger",
+]
+
+avoid_kicking = [
+    "klange",
+    "discord",
+]
+
+@isla.bind("reply", "^show blacklist$", i=True)
+def show_blacklist(self, c, e, msg, match):
+    if "friends" in dir(isla.bot.config) and e.source.nick in isla.bot.config.friends:
+        self.reply(c,e,"Blacklisted phrases are: {}".format(", ".join(blacklist)))
+
+@isla.bind("hear", ".*", i=True)
+def monitor_channel(self, c, e, msg, match):
+    if any([x in msg for x in blacklist]):
+        nick = e.source.nick.lower()
+        if nick in avoid_kicking:
+            return
+        c.kick(e.target, nick, "message contained blacklisted phrase")
+
