@@ -21,5 +21,7 @@ def brain_dump(self, c, e, msg, match):
 
 @isla.bind("reply", "^brain test set$")
 def brain_test_set(self, c, e, msg, match):
+    if "friends" not in dir(isla.bot.config) or e.source.nick not in isla.bot.config.friends:
+        return
     isla.bot.brain.set("foo.bar", {'a': 1, 'b': 'hello', 'c': {'test': 'foo','bar': 'baz'}})
     self.send(c,e,"okay!")
